@@ -1,8 +1,9 @@
 .game {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
+  text-align: center;
 }
 
 .game-info {
-  margin-left: 20px;
+  margin-top: 20px;
 }

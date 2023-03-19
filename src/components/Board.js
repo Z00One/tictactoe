@@ -1,61 +1,83 @@
-import React, { Component } from 'react'
+import React, { useState } from 'react';
 import Square from './Square';
-import "./Board.css"
+import "./Board.css";
 
-export default class Board extends Component {
-  // state - 자식 클래스에게 값을 전달해준다
-  constructor(props) {
-    super(props); // 부모 클래스의 생성자를 호출해야 본 클래스의 프로퍼티를 설정할 수 있다.
-    this.state = {
-      squares: Array(9).fill(null),
-      turn: 0
+const Board = () => {
+  const [squares, setSquares] = useState(Array(9), null); // square hook
+  const [turn, setTurn] = useState(true); // turn hook
+  const turnState = turn ? 'X' : 'O'; // set turn state
+
+  const handleClick = (i) => {
+    if (winner || squares[i]) { return; }  // 게임 끝 or 이미 값이 있는 경우 동작 안함
+    const newSquares = squares.slice();
+    newSquares[i] = turnState;  // 차례에 맞게 값 넣어주기
+    setSquares(newSquares);
+    setTurn(prev => !prev); // 차례 바꿔주기
+  };
+
+  // Squre rendering
+  const rederSqaure = (i) => {
+    return <Square onClick={() => handleClick(i)}
+      value={squares[i]} />  // send handleClick method
+  };
+
+  // 승자 확인
+  const calculateWinner = (squares) => {
+    const checkLines = [
+      [0, 1, 2], [3, 4, 5], [6, 7, 8], // -> ㅡ
+      [0, 3, 6], [1, 4, 7], [2, 5, 8], // -> |
+      [0, 4, 8], // -> \
+      [2, 4, 6]  // -> /
+    ];
+
+    // 체크
+    for (const checkLine of checkLines) {
+      console.log(checkLine);
+      const [indexA, indexB, indexC] = checkLine;
+      // 설정된 라인에 같은 값으로만 구성되어 있는지 확인
+      if (squares[indexA]
+        && squares[indexA] === squares[indexB]
+        && squares[indexB] === squares[indexC]
+        && squares[indexC] === squares[indexA])
+        return squares[indexA]
     }
+
+    return null;
   }
 
-  setTurn() {
-    
-  }
+  const winner = calculateWinner(squares);
+  const status = winner ? 'Winner : ' + winner : '차례 : ' + turnState;
 
-  // click event
-  handleClick(i) {
-    const turn = this.state.turn;
-    const squares = this.state.squares.slice();
-    
-    squares[i] = (turn % 2 == 0) ? 'O' : 'X'
-    
-    this.setState({ squares: squares })
-    this.setState({ turn: turn + 1 })
-    console.log (turn)
-  }
-  
-  rederSqure(i) {
-    return <Square onClick={() => this.handleClick(i)}
-    value={this.state.squares[i]} />  // send handleClick method
-  }
+  // // 게임 종료 메시지 출력
+  // const gameOverMessage = (winner) => {
+  //   if (winner) {
+  //     return(
+  //     window.alert(winner + "의 승리입니다.")
+  //     );
+  //   }
+  //   else return;
+  // }
 
-  render() {
-
-    const status = 'Next player: X, O';
-
-    return (
-      <div>
-        <div className="status">{status}</div>
-        <div className="board-row">
-          {this.rederSqure(0)}
-          {this.rederSqure(1)}
-          {this.rederSqure(2)}
-        </div>
-        <div className="board-row">
-          {this.rederSqure(3)}
-          {this.rederSqure(4)}
-          {this.rederSqure(5)}
-        </div>
-        <div className="board-row">
-          {this.rederSqure(6)}
-          {this.rederSqure(7)}
-          {this.rederSqure(8)}
-        </div>
+  return (
+    <div>
+      <div className="status">{status}</div>
+      <div className="board-row">
+        {rederSqaure(0)}
+        {rederSqaure(1)}
+        {rederSqaure(2)}
       </div>
-    )
-  }
+      <div className="board-row">
+        {rederSqaure(3)}
+        {rederSqaure(4)}
+        {rederSqaure(5)}
+      </div>
+      <div className="board-row">
+        {rederSqaure(6)}
+        {rederSqaure(7)}
+        {rederSqaure(8)}
+      </div>
+    </div>
+  )
 }
+
+export default Board;
